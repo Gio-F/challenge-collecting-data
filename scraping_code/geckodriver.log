@@ -1,0 +1,25 @@
+1643369111007	geckodriver	INFO	Listening on 127.0.0.1:44341
+1643369111508	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--remote-debugging-port" "39753" "-no-remote" "-profile" "/tmp/rust_mozprofilelVhR8x"
+1643369113277	Marionette	INFO	Marionette enabled
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /tmp/rust_mozprofilelVhR8x/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:39753/devtools/browser/5414d692-99a4-45d1-a8ec-c95c36094b70
+1643369117768	Marionette	INFO	Listening on port 43161
+1643369117803	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+libEGL warning: DRI2: failed to authenticate
+ATTENTION: default value of option mesa_glthread overridden by environment.
+JavaScript warning: https://pagead2.googlesyndication.com/bg/qgJV3VdNHF0UKJqll0M35s3ByNUeqPDUArL6SI-1xSU.js line 1 > eval line 4203 > eval line 1 > eval, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+1643369734457	Marionette	INFO	Stopped listening on port 43161
+JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
+console.warn: TopSitesFeed: Failed to fetch data from Contile server: NetworkError when attempting to fetch resource.
+1643373866175	geckodriver	INFO	Listening on 127.0.0.1:49937
+1643373866696	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--remote-debugging-port" "44947" "-no-remote" "-profile" "/tmp/rust_mozprofile2zVYdx"
+1643373869097	Marionette	INFO	Marionette enabled
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /tmp/rust_mozprofile2zVYdx/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:44947/devtools/browser/8e3e75df-7158-452d-bd1e-e7608be75314
+1643373877608	Marionette	INFO	Listening on port 36077
+1643373877694	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+libEGL warning: DRI2: failed to authenticate
+ATTENTION: default value of option mesa_glthread overridden by environment.
+JavaScript warning: https://pagead2.googlesyndication.com/bg/qgJV3VdNHF0UKJqll0M35s3ByNUeqPDUArL6SI-1xSU.js line 1 > eval line 1989 > eval, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+1643375489191	Marionette	INFO	Stopped listening on port 36077
+JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
