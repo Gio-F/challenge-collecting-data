@@ -1,0 +1,11 @@
+1643368733228	geckodriver	INFO	Listening on 127.0.0.1:61735
+1643368733761	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "--remote-debugging-port" "61736" "-no-remote" "-profile" "/tmp/rust_mozprofileSxLTBD"
+*** You are running in headless mode.
+[GFX1-]: No GPUs detected via PCI
+[GFX1-]: glxtest: process failed (received signal 11)
+1643368738680	Marionette	INFO	Marionette enabled
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /tmp/rust_mozprofileSxLTBD/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:61736/devtools/browser/22c2f153-d273-4426-ae3a-b82dcdec757b
+1643368743697	Marionette	INFO	Listening on port 61740
+1643368743836	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
