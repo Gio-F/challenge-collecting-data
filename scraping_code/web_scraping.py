@@ -39,6 +39,8 @@ with open("./Immoweb_Listing_Apartment.html", "r") as output_file:
 for elem in soup_1.find("div", {"class": "classified__information--address"}):
     prop_location = (elem.text).split("\n")
     prop_location_wo_spaces = prop_location[6].split(" ")
+
+    # This step appends locality into a list
     locality.append(prop_location_wo_spaces[-1])
 
 print(locality)
@@ -46,6 +48,9 @@ print(locality)
 # Contents[0] returns price of property + HTML tags.
 # To extract price run text on contents
 prop_price = soup_1.find("p", {"class": "classified__price"}).contents[0].text
+print(prop_price)
+
+# This step appends property price to a list.
 price.append(prop_price)
 
 print(price)
