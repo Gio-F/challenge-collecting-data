@@ -177,7 +177,7 @@ def save_data(ads: list,
     destination_file = os.path.join("data", filename)
     tmp_list = []
     for i in ads:
-        tmp_list.append(f"{housing_type}<#COL>{sub_type}<COL>{i}<#END>")
+        tmp_list.append(f"{housing_type}<#COL>{sub_type}<#COL>{i}<#END>")
     if append:
         with open(destination_file, "a") as my_file:
             my_file.writelines(tmp_list)

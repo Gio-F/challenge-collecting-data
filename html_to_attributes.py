@@ -8,22 +8,34 @@ import pandas as pd
 html_list = read_selenium_data.read_file("HOUSE_CASTLE.txt")
 
 url = html_list[3][2]
+print(url)
 r = requests.get(url)
-soup = BeautifulSoup(r.text, 'html.parser')
+soup = BeautifulSoup(r.text, 'lxml')
 classifield_table = soup.find_all('table', class_='classified-table')
 
+my_dictionary = {}
 
-#Giovanna had a idea to use user agent's in order to find hidden information
+
+def read_immoweb_code():
+    print("IMMOWEB CODE")
+    code_info = soup.find('div', class_="classified__header--immoweb-code")
+    for code_rows in code_info.find_all('div'):
+        print(code_rows)
+
+
+my_dictionary = {}
+
+
 def read_classifield_table(classifield_table):
     for info in classifield_table.find_all('tbody'):
         rows = info.find_all('tr')
         print("-" * 100)
         for row in rows:
             if not row.find_all('th', class_='classified-table__header'):
-                #print("=====> Header missing!")
+                print("=====> Header missing!")
                 continue
             if not row.find_all('td', class_='classified-table__data'):
-                #print("=====> Data missing!")
+                print("=====> Data missing!")
                 continue
             detail_header = row.find(
                 'th', class_='classified-table__header').contents[0].strip()
@@ -37,6 +49,8 @@ def read_classifield_table(classifield_table):
                     detail_data)
             else:
                 print(detail_header, "/", detail_data)
+            my_dictionary[detail_header] = detail_data
+    print(my_dictionary)
 
 
 #FOR REST OF THE INFORMATION
