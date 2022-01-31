@@ -52,9 +52,9 @@ def accept_cookies() -> None:
         button[0].click()
 
 
-def write_dump(savecollected_list: list, filename: str) -> None:
+def write_dump(savecollected_list: list, file_name: str) -> None:
     file_name = "sample.pkl"
-    open_file = open(filename, "wb")
+    open_file = open(file_name, "wb")
     pickle.dump(savecollected_list, open_file)
     open_file.close()
 
@@ -81,6 +81,7 @@ def run_the_code():
         inner_list.append(read_address())
         inner_list.append(read_price())
     pure_name = name.split(".")
+    new_name = pure_name[0] + ".pkl"
 
     print(html_list)
     driver.quit()
