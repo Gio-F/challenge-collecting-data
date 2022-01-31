@@ -1,9 +1,13 @@
+from cgitb import text
 import bs4 as bs
 from bs4 import BeautifulSoup
 import requests
 import time
 import read_selenium_data
+import selenium
 import pandas as pd
+from selenium import webdriver
+from selenium.webdriver.common.by import By
 
 html_list = read_selenium_data.read_file("HOUSE_CASTLE.txt")
 
@@ -13,8 +17,23 @@ soup = BeautifulSoup(r.text, 'html.parser')
 classifield_table = soup.find_all('table', class_='classified-table')
 
 
-#Giovanna had a idea to use user agent's in order to find hidden information
 def read_classifield_table(classifield_table):
+
+    driver = webdriver.Firefox()
+    driver.implicitly_wait(30)
+    driver.get(url)
+
+    # Save property location in prop_location variable.
+    prop_location = driver.find_element(
+        By.XPATH, '//div[@class="classified__information--address"]').text
+    print(prop_location)
+
+    # Save property price in prop_price variable.
+    raw_prop_price = driver.find_element(
+        By.XPATH, '//p[@class="classified__price"]').text.split("\n")
+    prop_price = raw_prop_price[0]
+    print(prop_price)
+
     for info in classifield_table.find_all('tbody'):
         rows = info.find_all('tr')
         print("-" * 100)
