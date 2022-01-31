@@ -4,8 +4,14 @@ import requests
 import time
 import read_selenium_data
 import pandas as pd
+import selenium_address
 
-html_list = read_selenium_data.read_file("HOUSE_CASTLE.txt")
+#remove this:
+#html_list = read_selenium_data.read_file("HOUSE_CASTLE.txt")
+
+html_list = selenium_address.read_dump("HOUSE_CASTLE.pkl")
+
+my_dictionary = {}
 
 url = html_list[3][2]
 print(url)
@@ -13,20 +19,17 @@ r = requests.get(url)
 soup = BeautifulSoup(r.text, 'lxml')
 classifield_table = soup.find_all('table', class_='classified-table')
 
-my_dictionary = {}
 
-
-def read_immoweb_code():
+def read_immoweb_code() -> None:
+    """ Reads immoweb ID code. This is used to identify properties"""
     print("IMMOWEB CODE")
     code_info = soup.find('div', class_="classified__header--immoweb-code")
     for code_rows in code_info.find_all('div'):
         print(code_rows)
 
 
-my_dictionary = {}
-
-
 def read_classifield_table(classifield_table):
+    """Uses BeaurifulSoup library to read websites from ImmoWeb"""
     for info in classifield_table.find_all('tbody'):
         rows = info.find_all('tr')
         print("-" * 100)
@@ -53,6 +56,9 @@ def read_classifield_table(classifield_table):
     print(my_dictionary)
 
 
+#For immoweb ID code
+#read_immoweb_code()
+
 #FOR REST OF THE INFORMATION
-for one_table in classifield_table:
-    read_classifield_table(one_table)
+#for one_table in classifield_table:
+#    read_classifield_table(one_table)

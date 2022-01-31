@@ -12,6 +12,7 @@ from selenium.webdriver.support.ui import Select
 import read_selenium_data
 
 driver = webdriver.Firefox()
+#driver = ""
 
 
 def open_web_page(url: str) -> None:
@@ -23,24 +24,27 @@ def open_web_page(url: str) -> None:
     driver.get(url)
 
 
-def read_address() -> int:
+def read_address() -> str:
     """ This reads the address from the website
     """
-    prop_location = driver.find_element(
-        By.XPATH, '//div[@class="classified__information--address"]').text
-    print("Location", prop_location)
-    return prop_location
+    prop_location = driver.find_elements(
+        By.XPATH, '//div[@class="classified__information--address"]')
+    if prop_location == None or len(prop_location) == 0:
+        return ""
+    return prop_location[0].text
 
 
-def read_price() -> int:
+def read_price() -> str:
     """ 
     This reads the address from the website
     """
-    raw_prop_price = driver.find_element(
-        By.XPATH, '//p[@class="classified__price"]').text.split("\n")
-    prop_price = raw_prop_price[0]
-    print("Price:", prop_price)
-    return prop_price
+    prop_price_list = driver.find_elements(
+        By.XPATH, '//p[@class="classified__price"]')  #.text.split("\n")
+    if prop_price_list == None or len(prop_price_list) == 0:
+        return ""
+    raw_prop_price = prop_price_list[0].text.split("\n")[0]
+
+    return raw_prop_price
 
 
 def accept_cookies() -> None:
@@ -53,7 +57,6 @@ def accept_cookies() -> None:
 
 
 def write_dump(savecollected_list: list, file_name: str) -> None:
-    file_name = "sample.pkl"
     open_file = open(file_name, "wb")
     pickle.dump(savecollected_list, open_file)
     open_file.close()
@@ -69,32 +72,38 @@ def read_dump(file_name) -> None:
 def run_the_code():
     name = "HOUSE_CASTLE.txt"
     html_list = read_selenium_data.read_file(name)
-    counter = 0  #Let's start with 5 files first
+    cookies_accepted = False
     for inner_list in html_list:
-        counter += 1
-        if counter > 3:
-            break
         url = inner_list[2]
-        print(url)
         open_web_page(url)
-        time.sleep(1)
+        if not cookies_accepted:
+            accept_cookies()
+        address = read_address()
+        price = read_price()
+        if address == "" or price == "":
+            continue
         inner_list.append(read_address())
         inner_list.append(read_price())
-    pure_name = name.split(".")
-    new_name = pure_name[0] + ".pkl"
-
-    print(html_list)
+    name_base = name.split(".")
+    new_name = "./data/" + name_base[0] + ".pkl"
+    write_dump(html_list, new_name)
     driver.quit()
+    print(html_list)
 
 
-#run_the_code()
+run_the_code()
+#driver.quit()
+
+#print(read_dump("HOUSE_CASTLE.pkl"))
+"""sample_list = [1, 2, 3, 4, 5]
+write_dump(sample_list, "./data/sample.pkl")
+print("toimiiko tää?", read_dump("./data/sample.pkl"))
+#driver.quit()"""
+
+#
 """open_web_page(
     "https://www.immoweb.be/en/classified/house/for-sale/ombret-rawsa/4540/9728478"
 )
 read_address()
 read_price()
 driver.quit()"""
-
-Name = "HOUSE_CASTLE.txt".split(".")
-NewName = Name[0] + ".pd"
-print(NewName)
