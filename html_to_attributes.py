@@ -29,17 +29,10 @@ class ImmowebSoup:
     def __init__(self, selenium_list, filename) -> None:
         """Constructor """
         self._my_dictionary = {}
-        #self._url = []  #list[0][2]
-        #for i in html_list:
-        #    print(i[2])
         self._selenium_list = selenium_list
         self._result_list = []
         self._my_dictionary = {}
         self._filename = filename
-        #self._soup = object
-        #self._classifield_table = object
-
-        #TODO HTML osoite sisältää osoitetiedon!!!!
 
     def _read_html_code(self, url, compiled_code):
         postal_code = compiled_code.findall(url)
@@ -56,24 +49,25 @@ class ImmowebSoup:
                                                 class_='classified-table')
         return classifield_table
 
-    def _read_price(self) -> list:
+    def _read_price(self, url) -> list:
         """ Reads immoweb price. This is used to identify properties.
         There might be two prices: 'normal price' and 'sr-only'. Normally,
         they are same.
         :return: list of prices found"""
         return_list = []
         code_info = self._soup.find('p', class_="classified__price")
-        for i, code_row in enumerate(code_info.find_all()):
+        for code_row in code_info.find_all():
+            print("URL ADDRESS:", url)
             price = str(code_row).replace(",", "").replace("€", "")
             price = ImmowebSoup._compiled_price.findall(price)[0]
             price = price.replace(">", "").replace("<", "")
+            print("PRICE: ", price)
             return_list.append(price)
         return return_list
 
     def _read_classifield_table(self, temp_dictionary, classifield_table):
         """Uses BeaurifulSoup library to read websites from ImmoWeb
         :classifield_table: """
-        print("=====> ", type(classifield_table))
         for info in classifield_table.find_all('tbody'):
             rows = info.find_all('tr')
             print("-" * 100)
@@ -98,7 +92,7 @@ class ImmowebSoup:
                     temp_dictionary[detail_header] = detail_data
 
     def main(self):
-        for list_row in self._selenium_list:
+        for list_row in self._selenium_list:  #bunch of lists should be checked
             print("LIST ROW:", list_row)
             url_address = list_row[2]
             tmp_dictonary = self._my_dictionary.copy()
@@ -109,13 +103,13 @@ class ImmowebSoup:
             tmp_dictonary["Post code"] = self._read_html_code(
                 url_address, ImmowebSoup._compiled_post_code)
             classifield_table = self._initialize_soup(url_address)
-            self._read_classifield_table(tmp_dictonary, classifield_table)
-            price_list = self._read_price()
+            for one_table in classifield_table:
+                self._read_classifield_table(tmp_dictonary, one_table)
+            price_list = self._read_price(url_address)
             tmp_dictonary["Price"] = price_list[0]
             if len(price_list) > 1:
                 tmp_dictonary["Price (sr only)"] = price_list[1]
-            self._classifield_table(tmp_dictonary, r)
-            #self._my_dictionary["url"] = url_address #TODO remember to add this end of this section
+            self._my_dictionary["url"] = url_address
             self._result_list.append(tmp_dictonary)
         for list_row in self._result_list:
             print("RESULT:", list_row)
@@ -125,7 +119,7 @@ class ImmowebSoup:
 file_to_read = "HOUSE_TOWN_HOUSE.txt"
 selenium_list = read_selenium_data.read_file(file_to_read)
 
-tmp_list = selenium_list[0:3]
+tmp_list = selenium_list
 #print("TMP LIST:", tmp_list)
 #for list_item in html_list:
 #    print(list_item)
@@ -136,6 +130,7 @@ if __name__ == "__main__":
     #for i in tmp_list:
     #    print("Hard disk: ", i)
 
+    #original_table_code()
     file_to_write = file_to_read.replace(".txt", ".attributes")
     my_obj = ImmowebSoup(tmp_list, f"./data/{file_to_write}")
     my_obj.main()
