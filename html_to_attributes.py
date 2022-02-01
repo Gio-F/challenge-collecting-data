@@ -24,7 +24,7 @@ class ImmowebSoup:
 
     _compiled_post_code = re.compile("(/[0-9]{4}/)")
     _compiled_immoweb_id = re.compile("(/[0-9]+\?)")
-    _compiled_price = re.compile(">([ a-zA-Z]+)?[0-9]+([ a-zA-Z]+)?<")
+    _compiled_price = re.compile("[0-9]+")
 
     def __init__(self, selenium_list, filename) -> None:
         """Constructor """
@@ -61,25 +61,21 @@ class ImmowebSoup:
         soup = BeautifulSoup(r.text, 'lxml')
         return_list = []
         code_info = soup.find('p', class_="classified__price")
-        for code_row in code_info.find_all():
-            print("CODE_ROW:", code_row)
-            price_text = str(code_row)
-            price_text = price_text.replace(":", "")
-            price_text = price_text.replace(" ", "")
-            price_text = price_text.replace("€", "")
-            price_text = price_text.replace(",", "")
-            print("PRICE_TEXT", price_text)
-            prices = ImmowebSoup._compiled_price.findall(price_text)  #[0]
-            if len(prices) == 0:
-                print("prices == 0")
-                continue
-            price = prices[0]
-            print("price has found!:", price)
-            price = str(price)
-            price = price.replace(">", "").replace("<", "")
-            return_list.append(price)
-            print(return_list)
-        return return_list
+        print("CODE INFO:", code_info)
+        price_text = str(code_info).replace(":", "")
+        price_text = price_text.replace(" ", "")
+        price_text = price_text.replace("€", "")
+        price_text = price_text.replace(",", "")
+        prices = ImmowebSoup._compiled_price.findall(price_text)
+        result_price = []
+        if len(prices) > 0:
+            for i in prices:
+                cleaned_price = str(i).replace(">", "").replace("<", "")
+                print("PRICE:", cleaned_price)
+                result_price.append(cleaned_price)
+        else:
+            return [str(code_info)]
+        return result_price
 
     def price_test(self):
         print("Price test started!!")
@@ -167,12 +163,12 @@ if __name__ == "__main__":
     #for i in tmp_list:
     #    print("Hard disk: ", i)
 
-    my_obj = ImmowebSoup(tmp_list, f"./data/price_error.attribute")
-    my_obj.price_test()
+    #my_obj = ImmowebSoup(tmp_list, f"./data/price_error.attribute")
+    #my_obj.price_test()
 
-    #file_to_write = file_to_read.replace(".txt", ".attributes")
-    #my_obj = ImmowebSoup(tmp_list, f"./data/{file_to_write}")
-    #my_obj.main()
+    file_to_write = file_to_read.replace(".txt", ".attributes")
+    my_obj = ImmowebSoup(tmp_list, f"./data/{file_to_write}")
+    my_obj.main()
     #
     #
     #
