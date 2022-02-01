@@ -5,6 +5,7 @@ extracts item specific information from tables for example 'building year',
 """
 
 from nturl2path import url2pathname
+import sys
 import bs4 as bs
 from bs4 import BeautifulSoup
 import requests
@@ -149,11 +150,13 @@ class ImmowebSoup:
         serialize_lists.write_dump(self._result_list, self._filename)
 
 
-file_to_read = "HOUSE_TOWN_HOUSE.txt"  #<== CHANGE THIS!!!!
-tmp_list = read_selenium_data.read_file(file_to_read)
+#file_to_read = "HOUSE_TOWN_HOUSE.txt"  #<== CHANGE THIS!!!!
+#tmp_list = read_selenium_data.read_file(file_to_read)
 #tmp_list = selenium_list
 
 if __name__ == "__main__":
+    file_to_read = str(sys.argv[1])  #<== THIS IS THE FILE NAME
+    tmp_list = read_selenium_data.read_file(file_to_read)
     file_to_write = file_to_read.replace(".txt", ".attributes")
     my_obj = ImmowebSoup(tmp_list, f"./data/{file_to_write}")
     my_obj.main()
