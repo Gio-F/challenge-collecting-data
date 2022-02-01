@@ -119,21 +119,15 @@ class ImmowebSoup:
 
     def main(self):
         for list_row in self._selenium_list:  #bunch of lists should be checked
-            print("LIST ROW:", list_row)
             url_address = list_row[2]
+            r = self._make_HTTP_request(url_address)
+            print("LIST ROW:", list_row)
             tmp_dictonary = self._my_dictionary.copy()
             tmp_dictonary["Immoweb ID"] = self._read_html_code(
                 url_address, ImmowebSoup._compiled_immoweb_id)
             tmp_dictonary["Property type"] = list_row[0]
             tmp_dictonary["property sub-type"] = list_row[1]
-            tmp_dictonary["Post code"] = self._read_html_code(
-                url_address, ImmowebSoup._compiled_post_code)
-            r = self._make_HTTP_request(url_address)
-            classifield_table = self._initialize_soup(r)
-            for one_table in classifield_table:
-                self._read_classifield_table(tmp_dictonary, one_table)
             price_list = self._read_price(r)
-            print("HTML ADDRESS:", url_address)
             if len(price_list) > 0:
                 tmp_dictonary["Price"] = price_list[0]
             else:
@@ -141,39 +135,25 @@ class ImmowebSoup:
                                 "len(price_list) == 0", str(price_list))
             if len(price_list) > 1:
                 tmp_dictonary["Price (sr only)"] = price_list[1]
-            self._my_dictionary["url"] = url_address
+            tmp_dictonary["Post code"] = self._read_html_code(
+                url_address, ImmowebSoup._compiled_post_code)
+            classifield_table = self._initialize_soup(r)
+            for one_table in classifield_table:
+                self._read_classifield_table(tmp_dictonary, one_table)
+            tmp_dictonary["url address"] = url_address
+            print("HTML ADDRESS:", url_address)
+
             self._result_list.append(tmp_dictonary)
         for list_row in self._result_list:
             print("RESULT:", list_row)
         serialize_lists.write_dump(self._result_list, self._filename)
 
 
-file_to_read = "HOUSE_TOWN_HOUSE.txt"
-selenium_list = read_selenium_data.read_file(file_to_read)
-
-tmp_list = selenium_list
-#print("TMP LIST:", tmp_list)
-#for list_item in html_list:
-#    print(list_item)
+file_to_read = "HOUSE_TOWN_HOUSE.txt"  #<== CHANGE THIS!!!!
+tmp_list = read_selenium_data.read_file(file_to_read)
+#tmp_list = selenium_list
 
 if __name__ == "__main__":
-    # THIS HOW TO TEST THAT WE REALLY CREATED A FILE:
-    #file_to_write = file_to_read.replace(".txt", ".attributes")
-    #tmp_list = serialize_lists.read_dump(f"./data/{file_to_write}")
-    #for i in tmp_list:
-    #    print("Hard disk: ", i)
-
-    #my_obj = ImmowebSoup(tmp_list, f"./data/price_error.attribute")
-    #my_obj.price_test()
-
     file_to_write = file_to_read.replace(".txt", ".attributes")
     my_obj = ImmowebSoup(tmp_list, f"./data/{file_to_write}")
     my_obj.main()
-    #
-    #
-    #
-"""    my_list = serialize_lists.read_dump("./data/testi.dump")
-    for i in my_list:
-        print(i)
-
-    pass"""
