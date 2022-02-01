@@ -26,14 +26,18 @@ class ImmowebSoup:
     _compiled_immoweb_id = re.compile("(/[0-9]+\?)")
     _compiled_price = re.compile("(>[0-9]+<)")
 
-    def __init__(self, selenium_list) -> None:
+    def __init__(self, selenium_list, filename) -> None:
         """Constructor """
         self._my_dictionary = {}
         #self._url = []  #list[0][2]
         #for i in html_list:
         #    print(i[2])
+        self._selenium_list = selenium_list
+        self._result_list = []
         self._my_dictionary = {}
-        #self._soup = object
+        self._filename = filename
+        self._soup = object
+        self._classifield_table = object
 
         #TODO HTML osoite sisältää osoitetiedon!!!!
 
@@ -45,10 +49,9 @@ class ImmowebSoup:
         postal_code = postal_code.replace("?", "")
         return postal_code
 
-    def _initialize_soup(self, url_address: str) -> None:
+    def _initialize_soup(self, url_address: str) -> object:
         r = requests.get(url_address)
         self._soup = BeautifulSoup(r.text, 'lxml')
-        #print(soup)
         self._classifield_table = self._soup.find_all(
             'table', class_='classified-table')
 
@@ -66,10 +69,10 @@ class ImmowebSoup:
             return_list.append(price)
         return return_list
 
-    def _read_classifield_table(self, classifield_table):
+    def _read_classifield_table(self, temp_dictionary):
         """Uses BeaurifulSoup library to read websites from ImmoWeb
         :classifield_table: """
-        for info in classifield_table.find_all('tbody'):
+        for info in self._classifield_table.find_all('tbody'):
             rows = info.find_all('tr')
             print("-" * 100)
             for row in rows:
@@ -85,56 +88,60 @@ class ImmowebSoup:
                 detail_data = row.find(
                     'td', class_='classified-table__data').contents[0].strip()
                 if not detail_data or not detail_header:
-                    pass
-                    """print(
-                        #"=====> Detail data or header is missing <=====    header:",
-                        detail_header,
-                        ",  data:",
-                        detail_data)"""
+                    print(
+                        "=====> Detail data or header is missing <=====    header:",
+                        detail_header, ",  data:", detail_data)
                 else:
                     print(detail_header, "/", detail_data)
-                    self._my_dictionary[detail_header] = detail_data
+                    temp_dictionary[detail_header] = detail_data
 
     def main(self):
-        """Testing different methods"""
-        if False:  #True
-            self._read_immoweb_code()
-        elif False:  #False
-            self.initialize_soup(self)
-            for one_table in self._classifield_table:
-                self._read_classifield_table(one_table)
-        elif False:  #False
-            for i in html_list:
-                url = i[2]
-                print(url)
-                post_code = self._read_html_code(
-                    url, ImmowebSoup._compiled_post_code)
-                immoweb_id = self._read_html_code(
-                    url, ImmowebSoup._compiled_immoweb_id)
-                print("POST CODE:", post_code)
-                print("IMMOWEB_ID:", immoweb_id)
-            print("TOTAL COUNT:", len(html_list))
-        elif True:
-            #self._initialize_soup() #This should be done once for every page
-            for list_row in selenium_list:
-                url_address = list_row[2]
-                self._my_dictionary["Immoweb ID"] = self._read_html_code(
-                    url, ImmowebSoup._compiled_immoweb_id)
-                self._my_dictionary["Property type"] = list_row[0]
-                self._my_dictionary["property sub-type"] = list_row[1]
-                self._my_dictionary["Post code"] = self._read_html_code(
-                    url, ImmowebSoup._compiled_post_code)
-                self._my_dictionary["url"] = url_address
+        for list_row in self._selenium_list:
+            print("LIST ROW:", list_row)
+            url_address = list_row[2]
+            tmp_dictonary = self._my_dictionary.copy()
+            tmp_dictonary["Immoweb ID"] = self._read_html_code(
+                url_address, ImmowebSoup._compiled_immoweb_id)
+            tmp_dictonary["Property type"] = list_row[0]
+            tmp_dictonary["property sub-type"] = list_row[1]
+            tmp_dictonary["Post code"] = self._read_html_code(
+                url_address, ImmowebSoup._compiled_post_code)
+            self._initialize_soup(url_address)
+            self._classifield_table(tmp_dictonary)
+            price_list = self._read_price()
+            tmp_dictonary["Price"] = price_list[0]
+            if len(price_list) > 1:
+                tmp_dictonary["Price (sr only)"] = price_list[1]
+            self._classifield_table(tmp_dictonary, r)
+            #self._my_dictionary["url"] = url_address #TODO remember to add this end of this section
+            self._result_list.append(tmp_dictonary)
+        for list_row in self._result_list:
+            print("RESULT:", list_row)
+        serialize_lists.write_dump(self._result_list, self._filename)
 
 
-#html_list = serialize_lists.read_dump("./data/HOUSE_CASTLE.pkl")
-selenium_list = read_selenium_data.read_file("HOUSE_TOWN_HOUSE.txt")
+file_to_read = "HOUSE_TOWN_HOUSE.txt"
+selenium_list = read_selenium_data.read_file(file_to_read)
 
 tmp_list = selenium_list[0:3]
-print(tmp_list)
+#print("TMP LIST:", tmp_list)
 #for list_item in html_list:
 #    print(list_item)
 
 if __name__ == "__main__":
-    my_obj = ImmowebSoup(tmp_list)
+    #file_to_write = file_to_read.replace(".txt", ".attributes")
+    #tmp_list = serialize_lists.read_dump(f"./data/{file_to_write}")
+    #for i in tmp_list:
+    #    print("Hard disk: ", i)
+
+    file_to_write = file_to_read.replace(".txt", ".attributes")
+    my_obj = ImmowebSoup(tmp_list, f"./data/{file_to_write}")
     my_obj.main()
+    #
+    #
+    #
+"""    my_list = serialize_lists.read_dump("./data/testi.dump")
+    for i in my_list:
+        print(i)
+
+    pass"""
