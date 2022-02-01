@@ -36,8 +36,8 @@ class ImmowebSoup:
         self._result_list = []
         self._my_dictionary = {}
         self._filename = filename
-        self._soup = object
-        self._classifield_table = object
+        #self._soup = object
+        #self._classifield_table = object
 
         #TODO HTML osoite sisältää osoitetiedon!!!!
 
@@ -52,8 +52,9 @@ class ImmowebSoup:
     def _initialize_soup(self, url_address: str) -> object:
         r = requests.get(url_address)
         self._soup = BeautifulSoup(r.text, 'lxml')
-        self._classifield_table = self._soup.find_all(
-            'table', class_='classified-table')
+        classifield_table = self._soup.find_all('table',
+                                                class_='classified-table')
+        return classifield_table
 
     def _read_price(self) -> list:
         """ Reads immoweb price. This is used to identify properties.
@@ -69,10 +70,11 @@ class ImmowebSoup:
             return_list.append(price)
         return return_list
 
-    def _read_classifield_table(self, temp_dictionary):
+    def _read_classifield_table(self, temp_dictionary, classifield_table):
         """Uses BeaurifulSoup library to read websites from ImmoWeb
         :classifield_table: """
-        for info in self._classifield_table.find_all('tbody'):
+        print("=====> ", type(classifield_table))
+        for info in classifield_table.find_all('tbody'):
             rows = info.find_all('tr')
             print("-" * 100)
             for row in rows:
@@ -106,8 +108,8 @@ class ImmowebSoup:
             tmp_dictonary["property sub-type"] = list_row[1]
             tmp_dictonary["Post code"] = self._read_html_code(
                 url_address, ImmowebSoup._compiled_post_code)
-            self._initialize_soup(url_address)
-            self._classifield_table(tmp_dictonary)
+            classifield_table = self._initialize_soup(url_address)
+            self._read_classifield_table(tmp_dictonary, classifield_table)
             price_list = self._read_price()
             tmp_dictonary["Price"] = price_list[0]
             if len(price_list) > 1:
