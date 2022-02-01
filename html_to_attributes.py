@@ -24,7 +24,7 @@ class ImmowebSoup:
 
     _compiled_post_code = re.compile("(/[0-9]{4}/)")
     _compiled_immoweb_id = re.compile("(/[0-9]+\?)")
-    _compiled_price = re.compile("(>[0-9]+<)")
+    _compiled_price = re.compile(">([ a-zA-Z]+)?[0-9]+([ a-zA-Z]+)?<")
 
     def __init__(self, selenium_list, filename) -> None:
         """Constructor """
@@ -42,28 +42,50 @@ class ImmowebSoup:
         postal_code = postal_code.replace("?", "")
         return postal_code
 
-    def _initialize_soup(self, url_address: str) -> object:
+    def _make_HTTP_request(self, url_address) -> object:
         r = requests.get(url_address)
+        return r
+
+    def _initialize_soup(self, r: object) -> object:
         self._soup = BeautifulSoup(r.text, 'lxml')
         classifield_table = self._soup.find_all('table',
                                                 class_='classified-table')
         return classifield_table
 
-    def _read_price(self, url) -> list:
+    def _read_price(self, r) -> list:
         """ Reads immoweb price. This is used to identify properties.
         There might be two prices: 'normal price' and 'sr-only'. Normally,
         they are same.
+        :r: A Beautiful Soup response
         :return: list of prices found"""
+        soup = BeautifulSoup(r.text, 'lxml')
         return_list = []
-        code_info = self._soup.find('p', class_="classified__price")
+        code_info = soup.find('p', class_="classified__price")
         for code_row in code_info.find_all():
-            print("URL ADDRESS:", url)
-            price = str(code_row).replace(",", "").replace("€", "")
-            price = ImmowebSoup._compiled_price.findall(price)[0]
+            print("CODE_ROW:", code_row)
+            price_text = str(code_row)
+            price_text = price_text.replace(":", "")
+            price_text = price_text.replace(" ", "")
+            price_text = price_text.replace("€", "")
+            price_text = price_text.replace(",", "")
+            print("PRICE_TEXT", price_text)
+            prices = ImmowebSoup._compiled_price.findall(price_text)  #[0]
+            if len(prices) == 0:
+                print("prices == 0")
+                continue
+            price = prices[0]
+            print("price has found!:", price)
+            price = str(price)
             price = price.replace(">", "").replace("<", "")
-            print("PRICE: ", price)
             return_list.append(price)
+            print(return_list)
         return return_list
+
+    def price_test(self):
+        print("Price test started!!")
+        url_address = "https://www.immoweb.be/en/classified/town-house/for-sale/kraainem/1950/9675986?searchId=61f83a2b0f96b"
+        r = self._make_HTTP_request(url_address)
+        self._read_price(r)
 
     def _read_classifield_table(self, temp_dictionary, classifield_table):
         """Uses BeaurifulSoup library to read websites from ImmoWeb
@@ -91,6 +113,14 @@ class ImmowebSoup:
                     print(detail_header, "/", detail_data)
                     temp_dictionary[detail_header] = detail_data
 
+    def _write_log(self, place: str, url: str, message: str,
+                   variable: str) -> None:
+        log_line = str("-" * 100)
+        log_message = f"\nPLACE: {place} \nMESSAGE: {message}\nVARIABLE: {variable}\nURL: {url}"
+        with open('html_to_attributes.log', "a") as my_log_file:
+            my_log_file.write(log_line)
+            my_log_file.write(log_message)
+
     def main(self):
         for list_row in self._selenium_list:  #bunch of lists should be checked
             print("LIST ROW:", list_row)
@@ -102,11 +132,17 @@ class ImmowebSoup:
             tmp_dictonary["property sub-type"] = list_row[1]
             tmp_dictonary["Post code"] = self._read_html_code(
                 url_address, ImmowebSoup._compiled_post_code)
-            classifield_table = self._initialize_soup(url_address)
+            r = self._make_HTTP_request(url_address)
+            classifield_table = self._initialize_soup(r)
             for one_table in classifield_table:
                 self._read_classifield_table(tmp_dictonary, one_table)
-            price_list = self._read_price(url_address)
-            tmp_dictonary["Price"] = price_list[0]
+            price_list = self._read_price(r)
+            print("HTML ADDRESS:", url_address)
+            if len(price_list) > 0:
+                tmp_dictonary["Price"] = price_list[0]
+            else:
+                self._write_log("main() - LOG:1", url_address,
+                                "len(price_list) == 0", str(price_list))
             if len(price_list) > 1:
                 tmp_dictonary["Price (sr only)"] = price_list[1]
             self._my_dictionary["url"] = url_address
@@ -125,15 +161,18 @@ tmp_list = selenium_list
 #    print(list_item)
 
 if __name__ == "__main__":
+    # THIS HOW TO TEST THAT WE REALLY CREATED A FILE:
     #file_to_write = file_to_read.replace(".txt", ".attributes")
     #tmp_list = serialize_lists.read_dump(f"./data/{file_to_write}")
     #for i in tmp_list:
     #    print("Hard disk: ", i)
 
-    #original_table_code()
-    file_to_write = file_to_read.replace(".txt", ".attributes")
-    my_obj = ImmowebSoup(tmp_list, f"./data/{file_to_write}")
-    my_obj.main()
+    my_obj = ImmowebSoup(tmp_list, f"./data/price_error.attribute")
+    my_obj.price_test()
+
+    #file_to_write = file_to_read.replace(".txt", ".attributes")
+    #my_obj = ImmowebSoup(tmp_list, f"./data/{file_to_write}")
+    #my_obj.main()
     #
     #
     #
