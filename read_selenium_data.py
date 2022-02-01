@@ -2,10 +2,12 @@
 This module is for reading files that scraping_with_selenium -module creates.
 This module can be used directly or used as an example
 """
+from math import ceil
 import os
 import re
 
 
+#TODO Tähän pitäisi laittaa serialize_lists
 def read_file(filename: str) -> list:
     """
     'scraping_with_selenium' writes files with special format. This
@@ -50,3 +52,35 @@ def all_files() -> list:
             for row in my_list:
                 result.append(row)
     return result
+
+
+def get_test_list(number):
+    list = []
+    for i in range(1, number):
+        list.append(i)
+    return list
+
+
+def split_files(size: int, filename: str) -> None:
+    """splits a selenium file. The parts will be
+    numbered. The destination folder is 'split'
+    :size: An int that defines how many rows will be
+    in one file
+    :filename: A string that defines the file that
+    will be splitted
+    """
+    list = read_file(filename)
+    tmp_list = []
+    remaining_list = list
+    list_len = len(list)
+    rounds = int(ceil(list_len / size))
+    for i in range(0, rounds):
+        tmp_list = remaining_list[0:size]
+        remaining_list = remaining_list[size:]
+        filename = filename.split(".")[0]
+        print("filename is:", f"./data/split/{filename}_{i+1}.txt")
+        print("tmp_list to save:", tmp_list)
+        selenium_address.Read_Address.write_dump(tmp_list, filename)
+
+
+#split_files(50, "HOUSE_TOWN_HOUSE.txt")

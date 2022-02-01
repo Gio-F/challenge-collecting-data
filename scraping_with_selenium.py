@@ -202,7 +202,7 @@ def write_log(search_count: int, saved_count: int, apartments: bool,
         house_type = "APPARTEMENT"
     else:
         house_type = "HOUSE"
-    filename = f"{house_type}_{sub_type}.txt"
+    filename = f"./data/log/{house_type}_{sub_type}.txt"
     log_txt = ""
     if search_count == saved_count:
         log_txt = (
