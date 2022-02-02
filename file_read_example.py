@@ -134,13 +134,17 @@ def prepare_csv_list():
                 correct_list.append(value)
 
 
+def create_csv_file():
+    df = pd.DataFrame(dict_for_csv_lists)
+    df.to_csv("./data/Final_result.csv", index=False)
+
+
+def remove_duplicates():
+    data = pd.read_csv("./data/Final_result.csv")
+    data.drop_duplicates(subset="Immoweb ID", keep=False, inplace=True)
+    data.to_csv("./data/Final_result_wo_duplicates.csv", index=False)
+
+
 prepare_csv_list()
-
-df = pd.DataFrame(dict_for_csv_lists)
-print("DF should be here", str(df))
-df.to_csv("./data/Final_result.csv", index=False)
-
-#print(dict_for_csv_lists['Immoweb ID'])
-"""for i in dict_for_csv_lists.keys():
-    list = dict_for_csv_lists[i]
-    print("length", i, len(list))"""
+create_csv_file()
+remove_duplicates()
