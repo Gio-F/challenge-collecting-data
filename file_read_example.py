@@ -1,4 +1,5 @@
 import serialize_lists
+import pandas as pd
 from math import ceil
 import serialize_lists
 
@@ -49,16 +50,6 @@ def read_all_keys():
     print(all_keys)
 
 
-wanted_keys = [
-    'Immoweb ID', 'Property type', 'property sub-type', 'Price', 'Post code',
-    'Building condition', 'Kitchen type', 'Bedrooms', 'Furnished',
-    'Terrace surface', 'Tenement building', 'Number of frontages',
-    'Swimming pool', 'How many fireplaces?', 'Garden', 'Garden orientation',
-    'Garden surface', 'Terrace', 'Surface of the plot'
-]
-
-#csv_lst_dict[Immoweb ID] =Immoweb_ID
-
 Immoweb_ID = []
 Property_type = []
 property_sub_type = []
@@ -79,42 +70,49 @@ garden_surface = []
 terrace = []
 surface_of_the_plot = []
 
+dict_for_csv_lists = {
+    'Immoweb ID': Immoweb_ID,
+    'Property type': Property_type,
+    'property sub-type': property_sub_type,
+    'Price': price,
+    'Post code': post_code,
+    'Building condition': building_condition,
+    'Kitchen type': kitchen_type,
+    'Bedrooms': bedrooms,
+    'Furnished': furnished,
+    'Terrace surface': terrace_surface,
+    'Tenement building': tenement_building,
+    'Number of frontages': number_of_frontages,
+    'Swimming pool': swimming_pool,
+    'How many fireplaces?': how_many_fireplaces,
+    'Garden': garden,
+    'Garden orientation': garden_orientation,
+    'Garden surface': garden_surface,
+    'Terrace': terrace,
+    'Surface of the plot': surface_of_the_plot
+}
+
 
 def prepare_csv_list():
     for inner_list in my_list:
         for my_dict in inner_list:
-            for wkey in wanted_keys:
+            for wkey in dict_for_csv_lists.keys():
+                value = object
                 if wkey in my_dict.keys():
                     value = my_dict[wkey]
-
-    pass
+                else:
+                    value = None
+                correct_list = dict_for_csv_lists[wkey]
+                correct_list.append(value)
 
 
 prepare_csv_list()
-"""def read_dictonaries():
-    for inner_list in my_list:
-        for my_dict in inner_list:
-            for wkey in wanted_keys:
-                if wkey in my_dict.keys():
-                    pass"""
-"""
-my_list3 = []
-my_list3.append(None)
-my_list3.append(None)
-print(len(my_list3))"""
 
-#read_required_attributes()
+df = pd.DataFrame(dict_for_csv_lists)
+print("DF should be here", str(df))
+df.to_csv("./data/Final_result.csv", index=False)
 
-
-#read_all_keys()
-def read_required_attributes():
-    for inner_list in my_list:
-        print(len(inner_list), type(inner_list))
-        for my_dict in inner_list:
-            for key, value in my_dict.items():
-                print(value)
-                if key not in wanted_keys:
-                    my_dict.pop(key)
-    print(inner_list)
-
-    #my_reduced_list = list(x:inner_list[x] for x in keys)
+#print(dict_for_csv_lists['Immoweb ID'])
+"""for i in dict_for_csv_lists.keys():
+    list = dict_for_csv_lists[i]
+    print("length", i, len(list))"""
