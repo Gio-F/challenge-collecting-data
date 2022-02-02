@@ -23,30 +23,16 @@ def read_dump(file_name: str) -> list:
     return loaded_list
 
 
-def merge_files() -> list:
-    """
-    merges all the .attribute -files
-    """
-    counter = 0
-    merged_list = ['a']
+def merge_files():
     all_files = os.listdir("./data/")
-    print("toimiiko tämä?")
-    for single_file in all_files:
-        if single_file.endswith(".attributes"):
-            print(single_file)
-            tmp_list = read_dump("./data/" + single_file)
-            merged_list = join_lists(merged_list, tmp_list)
-            counter += len(tmp_list)
+    merged_list = []
+    for file_name in all_files:
+        if file_name.endswith('.attributes'):
+            tmp_list = read_dump(f"./data/{file_name}")
             merged_list.append(tmp_list)
-    print("Merged list length:", len(merged_list))
-    print("Total length:", counter)
+    print("This should be 20:", len(merged_list))
     write_dump(merged_list, "./data/MERGED_LIST.NLTK")
-
-
-def join_lists(base_list: list, list_to_add: list) -> list:
-    for row in list_to_add:
-        base_list.append(row)
-    return base_list
+    return merged_list
 
 
 #merge_files()
