@@ -65,8 +65,6 @@ number_of_frontages = []
 swimming_pool = []
 how_many_fireplaces = []
 garden = []
-garden_orientation = []
-garden_surface = []
 terrace = []
 surface_of_the_plot = []
 
@@ -86,11 +84,41 @@ dict_for_csv_lists = {
     'Swimming pool': swimming_pool,
     'How many fireplaces?': how_many_fireplaces,
     'Garden': garden,
-    'Garden orientation': garden_orientation,
-    'Garden surface': garden_surface,
     'Terrace': terrace,
     'Surface of the plot': surface_of_the_plot
 }
+
+
+def kitchen_type(wkey, value):
+    if len(value) == 0 or value == 'No':
+        return 0
+    return 1
+
+
+def furnished(wkey, value):
+    if value == 'No':
+        return 0
+    if value == 'Yes':
+        return 1
+    return None
+
+
+def convert_values(wkey, value):
+    if wkey == 'Kitchen type':
+        return kitchen_type(wkey, value)
+    if wkey == 'Furnished':
+        return furnished(wkey, value)
+
+    if value == 'No':
+        return 0
+    elif value == 'Yes':
+        return 1
+    if wkey == 'Kitchen type':
+        if len(value) > 0:
+            return 1
+        else:
+            return 0
+    return value
 
 
 def prepare_csv_list():
@@ -99,7 +127,7 @@ def prepare_csv_list():
             for wkey in dict_for_csv_lists.keys():
                 value = object
                 if wkey in my_dict.keys():
-                    value = my_dict[wkey]
+                    value = convert_values(wkey, my_dict[wkey])
                 else:
                     value = None
                 correct_list = dict_for_csv_lists[wkey]
